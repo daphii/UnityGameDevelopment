@@ -31,10 +31,14 @@
             "id": "af16dbe2d036fbfb",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Unit 2.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Unit 2"
             }
           }
         ]
@@ -199,10 +203,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "4921ebac052242d1",
+  "active": "af16dbe2d036fbfb",
   "lastOpenFiles": [
-    "Images/Pasted image 20260323121302.png",
+    "Unit 2.md",
     "Overview.md",
+    "Images/Pasted image 20260323121302.png",
     "Images",
     "Images/Pasted image 20260323121412.png",
     "Welcome.md"
