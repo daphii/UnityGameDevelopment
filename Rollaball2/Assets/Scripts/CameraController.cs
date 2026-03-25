@@ -17,6 +17,9 @@ public class CameraController : DebugMonoBehaviour
     public GameObject followTarget;
     public GameObject followCamera;
 
+    Rigidbody targetRB;
+    Transform targetTransform;
+
     [Space]
     public float maxRotationSpeed = 5f;
     public float maxCameraZoom = 8f;
@@ -35,31 +38,20 @@ public class CameraController : DebugMonoBehaviour
     private void Awake()
     {
         player = ReInput.players.GetPlayer(0);
-    }
+        targetRB = followTarget.GetComponent<Rigidbody>();
+        targetTransform = followTarget.transform;
 
-    private void Update()
-    {
-        GetInput();
-        RotateAroundFocus();
-    }
-
-    void GetInput()
-    {
-        cameraHorizontal.x = player.GetAxis("CameraHorizontal");
     }
 
     private void FixedUpdate()
     {
-        transform.position = followTarget.transform.position;
-    }
-
-
-    void RotateAroundFocus()
-    {
-        // Rotate Camera focus point based on x input
-        Vector3 focusRotation = transform.localEulerAngles;
-        focusRotation.y += cameraHorizontal.x * maxRotationSpeed * Time.deltaTime;
-        transform.localEulerAngles = focusRotation;
+        transform.position = targetTransform.position;
+        // update forward to match the targets movment direction
+        Vector3 targetVelocity = targetRB.linearVelocity;
+        if (targetVelocity.magnitude > 0.1f)
+        {
+            transform.forward = targetVelocity.normalized;
+        }
     }
 
 }

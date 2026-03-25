@@ -1678,7 +1678,6 @@ MonoBehaviour:
   ShowDebugOverlay: 1
   PickupContainer: {fileID: 823797538}
   ScoreText: {fileID: 488113657}
-  WinText: {fileID: 517111773}
 --- !u!4 &883317993
 Transform:
   m_ObjectHideFlags: 0
