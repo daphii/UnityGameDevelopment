@@ -18,10 +18,12 @@ public class BallOverlayController : DebugMonoBehaviour
     public GameObject CurrentCupTarget;
 
     [Space]
-    public float LookSpeed = 5f;
+    public float LookSpeed = 50f;
+    public float RotateFollowThreshold = 5f;
 
     [Space]
     public GameObject AimIndicator;
+    public bool AimAssistEnabled = true;
 
     Transform ballTransform;
     BallController ballController;
@@ -58,7 +60,6 @@ public class BallOverlayController : DebugMonoBehaviour
             {
                 HideOverlay();
             }
-
         }
         else
         {
@@ -67,13 +68,14 @@ public class BallOverlayController : DebugMonoBehaviour
                 ActivateOverlay();
             }
         }
-
-
     }
 
     private void FixedUpdate()
     {
-        transform.position = ballTransform.position;
+        if (ballController.IsMoving)
+        {
+            FollowBall();
+        }
         ProcessInput();
     }
 
@@ -88,6 +90,17 @@ public class BallOverlayController : DebugMonoBehaviour
         if (OverlayActive && inputDirection.x != 0)
         {
             transform.Rotate(Vector3.up, inputDirection.x * LookSpeed * Time.deltaTime);
+        }
+    }
+
+    void FollowBall()
+    {
+        transform.position = ballTransform.position;
+        if (ballController.Speed > RotateFollowThreshold)
+        {
+            Vector3 direction = ballController.MovementDirection;
+            direction.y = 0;
+            transform.forward = direction;
         }
     }
 
@@ -125,9 +138,13 @@ public class BallOverlayController : DebugMonoBehaviour
         if (cupTransform != null)
         {
             // look at the cup target, but ignore the y axis to keep the overlay flat
-            Vector3 direction = cupTransform.position - ballTransform.position;
-            direction.y = 0;
-            transform.forward = direction.normalized;
+            if (AimAssistEnabled)
+            {
+                Vector3 direction = cupTransform.position - ballTransform.position;
+                direction.y = 0;
+                transform.forward = direction.normalized;
+            }
+
             AimIndicator.SetActive(true);
             OverlayActive = true;
         }

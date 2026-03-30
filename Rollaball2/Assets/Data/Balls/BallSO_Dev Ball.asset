@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5fee2284bf58246a9bdf53ea2f89fe, type: 3}
+  m_Name: BallSO_Dev Ball
+  m_EditorClassIdentifier: Assembly-CSharp::BallSO
+  Prefab: {fileID: 5862893188136256317, guid: 63ffb7563fe5f1a41bed5621a5b99270, type: 3}
+  maxPowerRating: 3
+  influenceRating: 2
+  bouncinessRating: 2
+  physicsMaterial: {fileID: 13400000, guid: f1d9a88aeb48f4e47b817e66a30435c9, type: 2}
+  material: {fileID: -876546973899608171, guid: bbc8b40774f235442a8860e1b10cdf01, type: 3}
