@@ -10,6 +10,7 @@ public class BallController : DebugMonoBehaviour
         info += $"Max Shot Power: {MaxShotPower}\n";
         info += $"Direction: {transform.forward}\n";
         info += $"Velocity: {rb.linearVelocity.magnitude:F2}\n";
+        info += $"Velocity Vector: {rb.linearVelocity}\n";
         return info;
     }
 
@@ -18,16 +19,25 @@ public class BallController : DebugMonoBehaviour
     public float OverloadPowerModifier = 1.25f;
     public float ChargeTime = 2f;
     float chargeAmmount = 0f;
-
     public AnimationCurve ShotPowerCurve;
+
+    [Title("Breaking Settings")]
+    public bool VelocityBrakesEnabled = true;
+    public float BrakingThreshold = 1.5f;
+    public float BrakingRate = 0.99f;
+    [Space]
+    public bool TorqueBrakesEnabled = true;
+    public float TorqueBrakingThreshold = 5f;
+    public float TorqueBrakingRate = 0.99f;
+
+    [Title("Influence Settings")]
+    public float RollingInfluence = 0.5f;
+    public float InflunceThreshold = 2f;
+
     public float ChargePercent => chargeAmmount / ChargeTime;
 
     bool isCharging = false;
     bool Overcharged = false;
-
-    [Space]
-    public float RollingInfluence = 0.5f;
-    public float InflunceThreshold = 2f;
 
     Vector2 inputDirection = Vector2.zero;
 
@@ -49,12 +59,12 @@ public class BallController : DebugMonoBehaviour
 
     private void Update()
     {
-        if (rb.linearVelocity.magnitude < 1.5f && rb.linearVelocity.magnitude > 0)
+        if (VelocityBrakesEnabled && rb.linearVelocity.magnitude < BrakingThreshold && rb.linearVelocity.magnitude > 0)
         {
             Brakes();
         }
 
-        if (rb.linearVelocity.magnitude < 5f && rb.linearVelocity.magnitude > 0)
+        if (TorqueBrakesEnabled && rb.linearVelocity.magnitude < TorqueBrakingThreshold && rb.linearVelocity.magnitude > 0)
         {
             TorqueBreaks();
         }
@@ -127,7 +137,7 @@ public class BallController : DebugMonoBehaviour
 
     void Brakes()
     {
-        rb.linearVelocity *= 0.99f;
+        rb.linearVelocity *= BrakingRate;
         if (rb.linearVelocity.magnitude < 0.05f)
         {
             rb.linearVelocity = Vector3.zero;
@@ -136,7 +146,7 @@ public class BallController : DebugMonoBehaviour
 
     void TorqueBreaks()
     {
-        rb.angularVelocity *= 0.99f;
+        rb.angularVelocity *= TorqueBrakingRate;
         if (rb.angularVelocity.magnitude < 0.05f)
         {
             rb.angularVelocity = Vector3.zero;
