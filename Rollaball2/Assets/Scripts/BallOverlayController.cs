@@ -1,4 +1,5 @@
 using Rewired;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class BallOverlayController : DebugMonoBehaviour
@@ -24,6 +25,7 @@ public class BallOverlayController : DebugMonoBehaviour
     [Space]
     public GameObject AimIndicator;
     public bool AimAssistEnabled = true;
+    public bool AimIndicatorEnabled = true;
 
     Transform ballTransform;
     BallController ballController;
@@ -32,6 +34,7 @@ public class BallOverlayController : DebugMonoBehaviour
 
     Player player;
 
+    [DisplayAsString(15)]
     public bool OverlayActive = false;
     public Vector3 AimDirection => transform.forward;
 
@@ -144,8 +147,10 @@ public class BallOverlayController : DebugMonoBehaviour
                 direction.y = 0;
                 transform.forward = direction.normalized;
             }
-
-            AimIndicator.SetActive(true);
+            if (AimIndicatorEnabled)
+            {
+                AimIndicator.SetActive(true);
+            }
             OverlayActive = true;
         }
         else
