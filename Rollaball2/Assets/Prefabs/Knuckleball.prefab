@@ -62,42 +62,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d512f4d1c24d0b4eac76406f31207aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallController
-  ShowDebugOverlay: 1
-  MaxShotPower: 50
-  OverloadPowerModifier: 1.25
-  ChargeTime: 2
-  ShotPowerCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: -0
-      value: 0.050173238
-      inSlope: 0.9498268
-      outSlope: 0.9498268
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0.9498268
-      outSlope: 0.9498268
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  ShowDebugOverlay: 0
+  PlayerID: -1
   VelocityBrakesEnabled: 1
-  BrakingThreshold: 1.5
   BrakingRate: 0.99
   TorqueBrakesEnabled: 1
-  TorqueBrakingThreshold: 5
   TorqueBrakingRate: 0.99
-  RollingInfluence: 1
-  InflunceThreshold: 2
+  BallActive: 0
   BallOverlay: {fileID: 0}
 --- !u!33 &960194521776242780
 MeshFilter:
@@ -106,7 +77,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5862893188136256317}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -1380829033229531849, guid: 5ad63d811b360614d8cff4a70930f053, type: 3}
 --- !u!23 &1097947664480783743
 MeshRenderer:
   m_ObjectHideFlags: 0

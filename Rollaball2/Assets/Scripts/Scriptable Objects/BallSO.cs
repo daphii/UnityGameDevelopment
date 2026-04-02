@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -36,7 +37,12 @@ public class BallSO : ScriptableObject
     int influenceRating = 1;
     [SerializeField, Range(0, 5), Tooltip("The bounciness rating of the ball")]
     int bouncinessRating = 1;
+
     int MaxStats = 7;
+
+    public int PowerRating => maxPowerRating;
+    public int InfluenceRating => influenceRating;
+    public int BouncinessRating => bouncinessRating;
     string CheckStatTotals()
     {
         string output = "";
@@ -73,8 +79,8 @@ public class BallSO : ScriptableObject
     public Material Material => material;
 
 
-    const int powerRatingConversion = 10;
-    const int powerBaseValue = 25;
+    const int powerRatingConversion = 12;
+    const int powerBaseValue = 30;
 
     const float influenceRatingConversion = 0.4f;
     const float influenceBaseValue = 0.25f;
@@ -127,23 +133,3 @@ public class BallSOCustomEditor
     }
 }
 #endif
-
-
-/* Ball Stat Distribution Concept
- * Basic Idea: Each ball has 4 points to add to the base stats. these stats are ratings, and have a conversion value to the actual stat.
- * 
- * Example: Base Stats
- * Max Power: 1
- * Influence: 1
- * Bounciness: 1
- * 
- * Example 1:
- * Max Power: 3
- * Influence: 2
- * Bounciness: 2
- * 
- * Example 2:
- * Max Power: 1
- * Influence: 4
- * Bounciness: 2
-*/

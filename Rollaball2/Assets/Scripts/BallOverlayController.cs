@@ -43,8 +43,6 @@ public class BallOverlayController : DebugMonoBehaviour
 
     private void Awake()
     {
-        SetBall(CurrentBallObject);
-        SetCupTarget(CurrentCupTarget);
         player = ReInput.players.GetPlayer(0);
     }
 
@@ -57,7 +55,7 @@ public class BallOverlayController : DebugMonoBehaviour
     {
         GetInput();
 
-        if (ballController.IsMoving)
+        if (ballController.CurrentState == BallController.BallState.Rolling)
         {
             if (OverlayActive)
             {
@@ -75,7 +73,7 @@ public class BallOverlayController : DebugMonoBehaviour
 
     private void FixedUpdate()
     {
-        if (ballController.IsMoving)
+        if (ballController.CurrentState != BallController.BallState.Cup)
         {
             FollowBall();
         }
@@ -84,7 +82,10 @@ public class BallOverlayController : DebugMonoBehaviour
 
     void GetInput()
     {
-        inputDirection.x = player.GetAxis("MoveHorizontal");
+        if (!player.GetButton("Interact"))
+        {
+            inputDirection.x = player.GetAxis("MoveHorizontal");
+        }
         //inputDirection.y = player.GetAxis("MoveVertical");
     }
 
@@ -103,7 +104,10 @@ public class BallOverlayController : DebugMonoBehaviour
         {
             Vector3 direction = ballController.MovementDirection;
             direction.y = 0;
-            transform.forward = direction;
+            if (direction.sqrMagnitude > 0.01f)
+            {
+                transform.forward = direction;
+            }
         }
     }
 

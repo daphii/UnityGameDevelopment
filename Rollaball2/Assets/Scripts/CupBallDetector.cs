@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CupBallDetector : DebugMonoBehaviour
@@ -6,13 +5,14 @@ public class CupBallDetector : DebugMonoBehaviour
     public override string DebugOverlayInfo()
     {
         string info = "";
-        info += $"Balls in Cup: {ballsInCup.Count}\n";
+        info += $"Ball in Cup: {BallInCup}\n";
         return info;
     }
 
+    bool BallInCup = false;
+
     private CupController cupController;
 
-    List<(GameObject ball, Rigidbody rb)> ballsInCup = new();
 
     private void Awake()
     {
@@ -23,8 +23,10 @@ public class CupBallDetector : DebugMonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            ballsInCup.Add((other.gameObject, other.attachedRigidbody));
-            GameManager.ResetGame.Invoke();
+            BallInCup = true;
+            Debug.Log("Ball Detected in Cup, Invoking Hole Completed Event");
+            BallController ballController = other.GetComponent<BallController>();
+            CourseManager.HoleCompleted.Invoke(ballController.PlayerID);
         }
     }
 
@@ -32,24 +34,8 @@ public class CupBallDetector : DebugMonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            ballsInCup.RemoveAll(x => x.ball == other.gameObject);
+            BallInCup = false;
         }
-    }
-
-    private void Update()
-    {
-        if (ballsInCup.Count > 0)
-        {
-            foreach (var (ball, rb) in ballsInCup)
-            {
-                StopBall(rb);
-            }
-        }
-    }
-
-    void StopBall(Rigidbody rb)
-    {
-        rb.linearVelocity *= .98f;
     }
 
 }

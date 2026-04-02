@@ -36,4 +36,19 @@ public class CupController : MonoBehaviour
             LiftPin();
         }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Ball Exited Proximity, Resetting Pin");
+            ResetPin();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Pin.position = new Vector3(Pin.position.x, pinStartHeight, Pin.position.z);
+        DOTween.Kill(Pin);
+    }
 }

@@ -1,4 +1,3 @@
-using Rewired;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,137 +7,157 @@ public class BallController : DebugMonoBehaviour
     {
         string info = "";
         info += $"<b>{ballData.Name}</b>\n";
-        info += $"Max Shot Power: {ballData.Power}\n";
-        info += $"Direction: {transform.forward}\n";
+        info += $"Power: {ballData.Power}\n";
+        info += $"State: {CurrentState}\n";
         info += $"Velocity: {rb.linearVelocity.magnitude:F2}\n";
-        info += $"Velocity Vector: {rb.linearVelocity}\n";
         info += $"AVelocity Magnitude: {rb.angularVelocity.magnitude:F2}\n";
-        info += $"AVelocity: {rb.angularVelocity}\n";
         return info;
     }
 
-    [Title("Ball Settings")]
-    public float OverloadPowerModifier = 1.25f;
-    public float ChargeTime = 2f;
-    float chargeAmmount = 0f;
-    public AnimationCurve ShotPowerCurve;
+
+    [Title("Ball Identifier")]
+    public int PlayerID = -1;
 
     [Title("Breaking Settings")]
     public bool VelocityBrakesEnabled = true;
-    public float BrakingThreshold = 1.5f;
+    float BrakingThreshold;
     public float BrakingRate = 0.99f;
     [Space]
     public bool TorqueBrakesEnabled = true;
-    public float TorqueBrakingVelocityThreshold = 5f;
-    public float TorqueBrakingAngularThreshold = 20f;
+    float TorqueBrakingVelocityThreshold;
+    float TorqueBrakingAngularThreshold;
     public float TorqueBrakingRate = 0.99f;
 
-    public float ChargePercent => chargeAmmount / ChargeTime;
 
-    bool isCharging = false;
-    bool Overcharged = false;
-
-    Vector2 inputDirection = Vector2.zero;
-
+    public bool BallActive;
 
     public Transform BallOverlay;
 
     Rigidbody rb;
-    Player player;
     BallDataReader ballData;
 
-    bool shotPressed;
+    float stateCooldown = 0f;
+    const float stateCooldownDuration = 0.1f;
+    bool StateCooldownActive => stateCooldown > 0f;
+
 
     public bool IsMoving => rb.linearVelocity.magnitude > 0.1f;
     public Vector3 MovementDirection => rb.linearVelocity.normalized;
     public float Speed => rb.linearVelocity.magnitude;
 
+    public enum BallState
+    {
+        Tee,
+        Rolling,
+        Stopped,
+        Cup
+    }
+
+    private BallState currentState = BallState.Tee;
+
+    public BallState CurrentState
+    {
+        get => currentState;
+        set
+        {
+            if (!StateCooldownActive && currentState != value)
+            {
+                switch (currentState)
+                {
+                    case BallState.Tee:
+                        // Handle exiting Tee state
+                        Debug.Log($"{ballData.Name}: Exiting Tee state");
+                        break;
+                    case BallState.Rolling:
+                        // Handle exiting Rolling state
+                        Debug.Log($"{ballData.Name}: Exiting Rolling state");
+                        break;
+                    case BallState.Stopped:
+                        // Handle exiting Stopped state
+                        Debug.Log($"{ballData.Name}: Exiting Stopped state");
+                        break;
+                    case BallState.Cup:
+                        // Handle exiting Cup state
+                        Debug.Log($"{ballData.Name}: Exiting Cup state");
+                        break;
+                }
+
+                currentState = value;
+                stateCooldown = stateCooldownDuration;
+
+                switch (currentState)
+                {
+                    case BallState.Tee:
+                        // Handle entering Tee state
+                        Debug.Log($"{ballData.Name}: Entering Tee state");
+                        rb.linearVelocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
+                        break;
+                    case BallState.Rolling:
+                        // Handle entering Rolling state
+                        Debug.Log($"{ballData.Name}: Entering Rolling state");
+                        break;
+                    case BallState.Stopped:
+                        // Handle entering Stopped state
+                        Debug.Log($"{ballData.Name}: Entering Stopped state");
+                        rb.linearVelocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
+                        break;
+                    case BallState.Cup:
+                        // Handle entering Cup state
+                        Debug.Log($"{ballData.Name}: Entering Cup state");
+                        break;
+                }
+            }
+        }
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        player = ReInput.players.GetPlayer(0);
         ballData = GetComponent<BallDataReader>();
-    }
-
-    private void Update()
-    {
-        if (VelocityBrakesEnabled && rb.linearVelocity.magnitude < BrakingThreshold && rb.linearVelocity.magnitude > 0)
-        {
-            Brakes();
-        }
-
-        if (TorqueBrakesEnabled && (rb.linearVelocity.magnitude < TorqueBrakingVelocityThreshold || rb.angularVelocity.magnitude > TorqueBrakingAngularThreshold))
-        {
-            TorqueBreaks();
-        }
-
-        GetInput();
+        BrakingThreshold = ballData.Influence * 2;
+        TorqueBrakingAngularThreshold = ballData.Influence * 2;
+        TorqueBrakingVelocityThreshold = ballData.Influence * 2;
     }
 
     private void FixedUpdate()
     {
-        ProcessInput();
-    }
-
-    void GetInput()
-    {
-        inputDirection.x = player.GetAxis("MoveHorizontal");
-        inputDirection.y = player.GetAxis("MoveVertical");
-
-        if (player.GetButtonDown("Interact"))
+        if (stateCooldown > 0f)
         {
-            StartCharging();
+            stateCooldown -= Time.fixedDeltaTime;
+            if (stateCooldown < 0f)
+            {
+                stateCooldown = 0f;
+            }
         }
-        if (player.GetButton("Interact"))
+
+        switch (CurrentState)
         {
-            AddCharge();
+            case BallState.Rolling:
+                if (VelocityBrakesEnabled && rb.linearVelocity.magnitude < BrakingThreshold && rb.linearVelocity.magnitude > 0)
+                {
+                    Brakes();
+                }
+
+                if (TorqueBrakesEnabled && (rb.linearVelocity.magnitude < TorqueBrakingVelocityThreshold || rb.angularVelocity.magnitude > TorqueBrakingAngularThreshold))
+                {
+                    TorqueBreaks();
+                }
+
+                if (rb.linearVelocity.magnitude < 0.1f)
+                {
+                    CurrentState = BallState.Stopped;
+                }
+                break;
+
+            case BallState.Stopped:
+                if (rb.linearVelocity.magnitude > 0.1f)
+                {
+                    CurrentState = BallState.Rolling;
+                }
+                break;
         }
-        if (player.GetButtonUp("Interact"))
-        {
-            ShootBall();
-        }
-    }
-
-    void StartCharging()
-    {
-        chargeAmmount = 0f;
-        Overcharged = false;
-    }
-
-    void AddCharge()
-    {
-        chargeAmmount += Time.deltaTime;
-        if (chargeAmmount > ChargeTime)
-        {
-            chargeAmmount = ChargeTime;
-            Overcharged = true;
-        }
-    }
-
-    void ProcessInput()
-    {
-        float currentSpeed = rb.linearVelocity.magnitude;
-        float speedThreshold = currentSpeed > 10 ? 1 : currentSpeed / 10;
-
-        float influenceAmmount = ballData.Influence * speedThreshold;
-
-        if (currentSpeed > 0.1f && inputDirection.magnitude > 0.1f)
-        {
-            // Change this to make the movement relative to the ball indicator's forward direction
-            Vector3 moveDirection = BallOverlay.forward * inputDirection.y + BallOverlay.right * inputDirection.x;
-            //Vector3 moveDirection = new Vector3(inputDirection.x, 0, inputDirection.y).normalized;
-            rb.AddForce(moveDirection * influenceAmmount);
-        }
-    }
-    void ShootBall()
-    {
-
-        Vector3 shotDirection = BallOverlay.forward;
-        float shotPower = ballData.Power * ShotPowerCurve.Evaluate(ChargePercent);
-        rb.AddForce(shotDirection * shotPower, ForceMode.Impulse);
-        chargeAmmount = 0f;
-        Overcharged = false;
-        Debug.Log($"Shooting ball with power: {shotPower}");
     }
 
     void Brakes()
@@ -159,4 +178,11 @@ public class BallController : DebugMonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Cup"))
+        {
+            CurrentState = BallState.Cup;
+        }
+    }
 }

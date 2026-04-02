@@ -12,6 +12,10 @@ public class BallDataReader : MonoBehaviour
     public float Influence => ballData.ActualInfluence;
     public float Bounciness => ballData.ActualBounciness;
 
+    public int PowerRating => ballData.PowerRating;
+    public int InfluenceRating => ballData.InfluenceRating;
+    public int BouncinessRating => ballData.BouncinessRating;
+
     private void Awake()
     {
         SetPhysicsMaterial();
